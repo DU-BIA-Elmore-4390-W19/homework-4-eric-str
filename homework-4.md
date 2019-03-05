@@ -11,26 +11,112 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of `
 Answer 1
 --------
 
-``` r
-set.seed(1234)
-df <- tbl_df(Boston)
-inTraining <- createDataPartition(df$medv, p = .75, list = F)
-training <- df[inTraining, ]
-testing  <- df[-inTraining, ]
+\`\`\`{r}
+=========
 
-bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
-bag_boston
-```
+\# Construct the train and test matrices
+========================================
 
-    ## 
-    ## Call:
-    ##  randomForest(formula = medv ~ ., data = training, mtry = 13) 
-    ##                Type of random forest: regression
-    ##                      Number of trees: 500
-    ## No. of variables tried at each split: 13
-    ## 
-    ##           Mean of squared residuals: 12.66461
-    ##                     % Var explained: 85.1
+set.seed(1101)
+==============
+
+train = sample(dim(Boston)\[1\], dim(Boston)\[1\]/2)
+====================================================
+
+X.train = Boston\[train, -14\]
+==============================
+
+X.test = Boston\[-train, -14\]
+==============================
+
+Y.train = Boston\[train, 14\]
+=============================
+
+Y.test = Boston\[-train, 14\]
+=============================
+
+bag\_boston\_25\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 25)
+=============================================================================================================================
+
+bag\_boston\_50\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 50)
+=============================================================================================================================
+
+bag\_boston\_75\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 75)
+=============================================================================================================================
+
+bag\_boston\_100\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 100)
+===============================================================================================================================
+
+bag\_boston\_125\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 125)
+===============================================================================================================================
+
+bag\_boston\_150\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 150)
+===============================================================================================================================
+
+bag\_boston\_175\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 175)
+===============================================================================================================================
+
+bag\_boston\_200\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 200)
+===============================================================================================================================
+
+bag\_boston\_225\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 225)
+===============================================================================================================================
+
+bag\_boston\_250\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 250)
+===============================================================================================================================
+
+bag\_boston\_275\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 275)
+===============================================================================================================================
+
+bag\_boston\_300\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 300)
+===============================================================================================================================
+
+bag\_boston\_325\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 325)
+===============================================================================================================================
+
+bag\_boston\_350\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 350)
+===============================================================================================================================
+
+bag\_boston\_375\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 375)
+===============================================================================================================================
+
+bag\_boston\_400\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 400)
+===============================================================================================================================
+
+bag\_boston\_425\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 425)
+===============================================================================================================================
+
+bag\_boston\_450\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 450)
+===============================================================================================================================
+
+bag\_boston\_475\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 475)
+===============================================================================================================================
+
+bag\_boston\_500\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 500)
+===============================================================================================================================
+
+plot(1:500, rf.boston.p*t**e**s**t*mse, col = "green", type = "l", xlab = "Number of Trees",
+============================================================================================
+
+ylab = "Test MSE", ylim = c(10, 19))
+====================================
+
+lines(1:500, rf.boston.p.2*t**e**s**t*mse, col = "red", type = "l")
+===================================================================
+
+lines(1:500, rf.boston.p.sq*t**e**s**t*mse, col = "blue", type = "l")
+=====================================================================
+
+legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"),
+===================================================================================
+
+cex = 1, lty = 1)
+=================
+
+bag\_boston
+===========
+
+\`\`\`
 
 Problem 2
 ---------

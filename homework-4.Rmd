@@ -32,15 +32,51 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of
 `ntree` from 25 to 500 in steps of 25 and `mtry` from 3 to 9 for by 1. 
 
 ## Answer 1
-```{r}
-set.seed(1234)
-df <- tbl_df(Boston)
-inTraining <- createDataPartition(df$medv, p = .75, list = F)
-training <- df[inTraining, ]
-testing  <- df[-inTraining, ]
-
-bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
-bag_boston
+# 
+# 
+# ```{r}
+# # Construct the train and test matrices
+# set.seed(1101)
+# train = sample(dim(Boston)[1], dim(Boston)[1]/2)
+# X.train = Boston[train, -14]
+# X.test = Boston[-train, -14]
+# Y.train = Boston[train, 14]
+# Y.test = Boston[-train, 14]
+# 
+# bag_boston_25_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 25)
+# bag_boston_50_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 50)
+# bag_boston_75_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 75)
+# bag_boston_100_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 100)
+# bag_boston_125_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 125)
+# bag_boston_150_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 150)
+# bag_boston_175_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 175)
+# bag_boston_200_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 200)
+# bag_boston_225_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 225)
+# bag_boston_250_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 250)
+# bag_boston_275_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 275)
+# bag_boston_300_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 300)
+# bag_boston_325_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 325)
+# bag_boston_350_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 350)
+# bag_boston_375_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 375)
+# bag_boston_400_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 400)
+# bag_boston_425_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 425)
+# bag_boston_450_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 450)
+# bag_boston_475_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 475)
+# bag_boston_500_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 500)
+# 
+# 
+# plot(1:500, rf.boston.p$test$mse, col = "green", type = "l", xlab = "Number of Trees", 
+#     ylab = "Test MSE", ylim = c(10, 19))
+# lines(1:500, rf.boston.p.2$test$mse, col = "red", type = "l")
+# lines(1:500, rf.boston.p.sq$test$mse, col = "blue", type = "l")
+# legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"), 
+#     cex = 1, lty = 1)
+# 
+# 
+# 
+# 
+# 
+# bag_boston
 
 
 ```
