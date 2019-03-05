@@ -17,7 +17,20 @@ df <- tbl_df(Boston)
 inTraining <- createDataPartition(df$medv, p = .75, list = F)
 training <- df[inTraining, ]
 testing  <- df[-inTraining, ]
+
+bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
+bag_boston
 ```
+
+    ## 
+    ## Call:
+    ##  randomForest(formula = medv ~ ., data = training, mtry = 13) 
+    ##                Type of random forest: regression
+    ##                      Number of trees: 500
+    ## No. of variables tried at each split: 13
+    ## 
+    ##           Mean of squared residuals: 12.66461
+    ##                     % Var explained: 85.1
 
 Problem 2
 ---------

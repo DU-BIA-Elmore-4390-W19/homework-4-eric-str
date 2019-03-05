@@ -38,6 +38,11 @@ df <- tbl_df(Boston)
 inTraining <- createDataPartition(df$medv, p = .75, list = F)
 training <- df[inTraining, ]
 testing  <- df[-inTraining, ]
+
+bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
+bag_boston
+
+
 ```
 
 
