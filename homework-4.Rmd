@@ -1,6 +1,6 @@
 ---
 title: 'Homework 4: Bags, Forests, Boosts, oh my'
-author: "Your Name Goes Here"
+author: "Eric Stromgren"
 date: "2/28/2019"
 output: github_document
 ---
@@ -8,6 +8,23 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r libs, message = F, warning = F, include = F}
+library(tidyverse)
+library(broom)
+library(glmnet)
+library(caret)
+library(ISLR)
+library(janitor)
+library(stringr)
+library(rpart)
+library(rpart.plot)
+library(partykit)
+library(randomForest)
+library(MASS)
+library(gbm)
+theme_set(theme_bw())
+```
+
 
 ## Problem 1
 
@@ -15,6 +32,14 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of
 `ntree` from 25 to 500 in steps of 25 and `mtry` from 3 to 9 for by 1. 
 
 ## Answer 1
+```{r}
+set.seed(1234)
+df <- tbl_df(Boston)
+inTraining <- createDataPartition(df$medv, p = .75, list = F)
+training <- df[inTraining, ]
+testing  <- df[-inTraining, ]
+```
+
 
 ## Problem 2
 
