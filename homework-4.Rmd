@@ -32,21 +32,75 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of
 `ntree` from 25 to 500 in steps of 25 and `mtry` from 3 to 9 for by 1. 
 
 ## Answer 1
-# 
-# 
-# ```{r}
-# # Construct the train and test matrices
-# set.seed(1101)
-# train = sample(dim(Boston)[1], dim(Boston)[1]/2)
-# X.train = Boston[train, -14]
-# X.test = Boston[-train, -14]
-# Y.train = Boston[train, 14]
-# Y.test = Boston[-train, 14]
-# 
-# bag_boston_25_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 25)
-# bag_boston_50_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 50)
-# bag_boston_75_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 75)
-# bag_boston_100_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 100)
+https://uc-r.github.io/random_forests
+
+```{r}
+set.seed(1)
+df<- tbl_df(Boston)
+inTraining <- createDataPartition(df$medv, p=.75, list= F)
+training <- df[inTraining, ]
+testing <- df[-inTraining, ]
+
+for (t in training) {
+  i = 0
+  rf_boston_cv <- train(medv ~.,
+                        data = training,
+                        method = "rf",
+                        ntree = 25 + (i  * 25),
+                        importance = T,
+                        tuneGrid = data.frame(mtry=3:9))
+  summary(rf_boston_cv)
+  i <- i + 1
+  if (i == 19) {
+    break}
+}
+```
+
+
+
+# Construct the train and test matrices
+set.seed(1234)
+df <- tbl_df(Boston)
+inTraining <- createDataPartition(df$medv, p = .75, list = F)
+training <- df[inTraining, ]
+testing  <- df[-inTraining, ]
+
+tuneRF(x, y, mtryStart, ntreeTry=50, stepFactor=2, improve=0.05,
+       trace=TRUE, plot=TRUE, doBest=FALSE, ...)
+
+
+set.seed(1234)
+grid <- expand.grid(n.trees = seq(25, 500, by = 25),
+                    n.minobsinnode = 5)
+
+set.seed(1234)
+rf_boston_cv <- train(medv ~ ., 
+                      data = training,
+                      method = "rf",
+                      ntree = 100,
+                      importance = T,
+                      tuneGrid = data.frame(mtry = 3:9))
+rf_boston_cv
+
+
+
+
+
+bag_boston_25_3 <- randomForest(training, testing, mtry = 3, ntree = 25)
+```
+
+```{r}
+bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
+bag_boston
+```
+
+
+
+
+
+bag_boston_50_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 50)
+bag_boston_75_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 75)
+bag_boston_100_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 100)
 # bag_boston_125_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 125)
 # bag_boston_150_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 150)
 # bag_boston_175_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 175)
@@ -63,19 +117,19 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of
 # bag_boston_450_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 450)
 # bag_boston_475_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 475)
 # bag_boston_500_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 500)
-# 
-# 
-# plot(1:500, rf.boston.p$test$mse, col = "green", type = "l", xlab = "Number of Trees", 
+#
+#
+# plot(1:500, rf.boston.p$test$mse, col = "green", type = "l", xlab = "Number of Trees",
 #     ylab = "Test MSE", ylim = c(10, 19))
 # lines(1:500, rf.boston.p.2$test$mse, col = "red", type = "l")
 # lines(1:500, rf.boston.p.sq$test$mse, col = "blue", type = "l")
-# legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"), 
+# legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"),
 #     cex = 1, lty = 1)
-# 
-# 
-# 
-# 
-# 
+#
+#
+#
+#
+#
 # bag_boston
 
 
@@ -93,3 +147,89 @@ test MSE.
 2. Fit a multiple regression model to the training data and report the 
 estimated test MSE
 3. Summarize your results. 
+
+
+a.
+```{r}
+library(tree)
+library(ISLR)
+attach(Carseats)
+set.seed(9823)
+df<- tbl_df(Carseats)
+inTraining <- createDataPartition(df$Sales, p=.50, list= F)
+training <- df[inTraining, ]
+testing <- df[-inTraining, ]
+```
+
+b.
+
+```{r}
+tree_carseats <- rpart::rpart(Sales ~ ., 
+                      data = training,
+                      control = rpart.control(minsplit = 20))
+summary(tree_carseats)
+prp(tree_carseats)
+```
+
+```{r}
+plot(as.party(tree_carseats))
+```
+
+```{r}
+pred_carseats = predict(tree_carseats, testing)
+mean((testing$Sales - pred_carseats)^2)
+```
+
+The Test MSE is 4.48
+
+c.
+
+```{r}
+
+fit_control <- trainControl(method = "repeatedcv",
+                            number = 10, 
+                            repeats = 10)
+cv_tree_carseats <- train(Sales ~ ., 
+                          data = training,
+                          method = "rpart", 
+                          trControl = fit_control)
+plot(cv_tree_carseats)
+```
+```{r}
+plot(as.party(cv_tree_carseats$finalModel))
+```
+
+```{r}
+pred_carseats_1 = predict(cv_tree_carseats, testing)
+mean((testing$Sales - pred_carseats_1)^2)
+```
+Pruning increases the test MSE to 4.99
+
+
+d.
+
+```{r}
+bag_carseats <- randomForest(Sales ~ ., data = training, mtry = 10)
+bag_carseats
+```
+
+```{r}
+test_preds <- predict(bag_carseats, newdata = testing)
+carseats_test_df <- testing %>%
+  mutate(y_hat_bags = test_preds,
+         sq_err_bags = (y_hat_bags - Sales)^2)
+mean(carseats_test_df$sq_err_bags)
+```
+The test error rate on the bagging approach is 3.06. Nice reduction. 
+
+```{r}
+importance(bag_carseats)
+```
+ShelveLoc, Price and CompPrice are the most important predictors of Sales.
+
+e.
+
+
+
+
+
