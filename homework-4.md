@@ -400,7 +400,7 @@ mean((testing$Sales - pred_carseats_1)^2)
 
     ## [1] 6.170433
 
-Pruning increases the test MSE to 4.99
+Pruning increases the test MSE to 6.17
 
 1.  
 
@@ -449,4 +449,315 @@ importance(bag_carseats)
 
 ShelveLoc, Price and CompPrice are the most important predictors of Sales.
 
-1.
+1.  
+
+``` r
+rf_carseats <- randomForest(Sales ~ ., 
+                          data = training,
+                          mtry = 10)
+rf_carseats
+```
+
+    ## 
+    ## Call:
+    ##  randomForest(formula = Sales ~ ., data = training, mtry = 10) 
+    ##                Type of random forest: regression
+    ##                      Number of trees: 500
+    ## No. of variables tried at each split: 10
+    ## 
+    ##           Mean of squared residuals: 2.82273
+    ##                     % Var explained: 62
+
+``` r
+pred_carseats_3 = predict(rf_carseats, testing)
+mean((testing$Sales - pred_carseats_3)^2)
+```
+
+    ## [1] 3.076327
+
+The random forest MSE is even lower at 2.87.
+
+``` r
+importance(rf_carseats)
+```
+
+    ##             IncNodePurity
+    ## CompPrice      142.187808
+    ## Income         124.504551
+    ## Advertising    118.541537
+    ## Population      48.858268
+    ## Price          329.836035
+    ## ShelveLoc      492.683771
+    ## Age            104.867523
+    ## Education       49.768182
+    ## Urban            7.216004
+    ## US              18.873052
+
+The most important variables in the random forest model are ShelveLoc, Price, and Comp Price again liked the baggged appraoch.
+
+Additional questions 3. Summarize your results.
+
+1.  
+
+``` r
+grid <- expand.grid(interaction.depth = c(1, 3), 
+                    n.trees = seq(0, 2000, by = 100),
+                    shrinkage = c(.01, 0.001),
+                    n.minobsinnode = 10)
+trainControl <- trainControl(method = "cv", number = 5)
+gbm_carseats <- train(Sales ~ ., 
+                    data = training, 
+                    distribution = "gaussian", 
+                    method = "gbm",
+                    trControl = trainControl, 
+                    tuneGrid = grid,
+                    verbose = FALSE)
+```
+
+    ## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
+    ## trainInfo, : There were missing values in resampled performance measures.
+
+``` r
+gbm_carseats
+```
+
+    ## Stochastic Gradient Boosting 
+    ## 
+    ## 201 samples
+    ##  10 predictor
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (5 fold) 
+    ## Summary of sample sizes: 160, 161, 161, 161, 161 
+    ## Resampling results across tuning parameters:
+    ## 
+    ##   shrinkage  interaction.depth  n.trees  RMSE      Rsquared   MAE     
+    ##   0.001      1                     0     2.707941        NaN  2.198810
+    ##   0.001      1                   100     2.658221  0.3072206  2.162933
+    ##   0.001      1                   200     2.614692  0.3338248  2.132458
+    ##   0.001      1                   300     2.576900  0.3504440  2.104695
+    ##   0.001      1                   400     2.541819  0.3675903  2.078234
+    ##   0.001      1                   500     2.507354  0.3873201  2.049150
+    ##   0.001      1                   600     2.477261  0.3996785  2.024150
+    ##   0.001      1                   700     2.448646  0.4089865  2.000409
+    ##   0.001      1                   800     2.422030  0.4193878  1.976754
+    ##   0.001      1                   900     2.395144  0.4320000  1.953175
+    ##   0.001      1                  1000     2.369702  0.4443429  1.930521
+    ##   0.001      1                  1100     2.347348  0.4543584  1.910573
+    ##   0.001      1                  1200     2.324835  0.4633463  1.891582
+    ##   0.001      1                  1300     2.304761  0.4716868  1.874211
+    ##   0.001      1                  1400     2.285108  0.4802836  1.857733
+    ##   0.001      1                  1500     2.266160  0.4881776  1.841928
+    ##   0.001      1                  1600     2.247849  0.4952085  1.826712
+    ##   0.001      1                  1700     2.230193  0.5016889  1.810946
+    ##   0.001      1                  1800     2.212902  0.5082136  1.796382
+    ##   0.001      1                  1900     2.196370  0.5159103  1.782517
+    ##   0.001      1                  2000     2.180384  0.5226449  1.769185
+    ##   0.001      3                     0     2.707941        NaN  2.198810
+    ##   0.001      3                   100     2.618874  0.5270922  2.125306
+    ##   0.001      3                   200     2.536355  0.5458457  2.059462
+    ##   0.001      3                   300     2.463641  0.5609235  2.001196
+    ##   0.001      3                   400     2.399009  0.5768398  1.948741
+    ##   0.001      3                   500     2.339175  0.5873023  1.899297
+    ##   0.001      3                   600     2.283001  0.6003513  1.852651
+    ##   0.001      3                   700     2.230245  0.6120673  1.809097
+    ##   0.001      3                   800     2.183836  0.6223029  1.769263
+    ##   0.001      3                   900     2.139413  0.6327802  1.731350
+    ##   0.001      3                  1000     2.100495  0.6413786  1.697637
+    ##   0.001      3                  1100     2.060811  0.6500729  1.664182
+    ##   0.001      3                  1200     2.024805  0.6576679  1.634443
+    ##   0.001      3                  1300     1.990637  0.6645470  1.606976
+    ##   0.001      3                  1400     1.958253  0.6719663  1.581116
+    ##   0.001      3                  1500     1.926799  0.6780308  1.555926
+    ##   0.001      3                  1600     1.896877  0.6835754  1.531475
+    ##   0.001      3                  1700     1.869955  0.6890268  1.508992
+    ##   0.001      3                  1800     1.844864  0.6927973  1.488675
+    ##   0.001      3                  1900     1.819554  0.6977340  1.467633
+    ##   0.001      3                  2000     1.795715  0.7020571  1.448543
+    ##   0.010      1                     0     2.707941        NaN  2.198810
+    ##   0.010      1                   100     2.373249  0.4334303  1.933180
+    ##   0.010      1                   200     2.185158  0.5158183  1.772317
+    ##   0.010      1                   300     2.048617  0.5703270  1.657528
+    ##   0.010      1                   400     1.932882  0.6211901  1.560355
+    ##   0.010      1                   500     1.832529  0.6527950  1.476900
+    ##   0.010      1                   600     1.745839  0.6817872  1.408201
+    ##   0.010      1                   700     1.671204  0.7049254  1.351421
+    ##   0.010      1                   800     1.611004  0.7193537  1.303108
+    ##   0.010      1                   900     1.556412  0.7297823  1.264027
+    ##   0.010      1                  1000     1.516110  0.7374018  1.232029
+    ##   0.010      1                  1100     1.474418  0.7434692  1.198131
+    ##   0.010      1                  1200     1.436771  0.7506812  1.167748
+    ##   0.010      1                  1300     1.408708  0.7552229  1.144786
+    ##   0.010      1                  1400     1.387525  0.7585885  1.126181
+    ##   0.010      1                  1500     1.371684  0.7607528  1.111865
+    ##   0.010      1                  1600     1.355249  0.7633029  1.098063
+    ##   0.010      1                  1700     1.343519  0.7650400  1.085707
+    ##   0.010      1                  1800     1.334934  0.7661658  1.076758
+    ##   0.010      1                  1900     1.326727  0.7674918  1.068423
+    ##   0.010      1                  2000     1.319458  0.7689825  1.063663
+    ##   0.010      3                     0     2.707941        NaN  2.198810
+    ##   0.010      3                   100     2.107300  0.6458832  1.703433
+    ##   0.010      3                   200     1.792486  0.7054886  1.443958
+    ##   0.010      3                   300     1.613111  0.7324781  1.306434
+    ##   0.010      3                   400     1.495751  0.7509791  1.205636
+    ##   0.010      3                   500     1.432185  0.7565919  1.147454
+    ##   0.010      3                   600     1.392641  0.7598289  1.118052
+    ##   0.010      3                   700     1.364240  0.7634439  1.096448
+    ##   0.010      3                   800     1.351776  0.7636292  1.086685
+    ##   0.010      3                   900     1.342408  0.7646782  1.078344
+    ##   0.010      3                  1000     1.333988  0.7659227  1.072774
+    ##   0.010      3                  1100     1.329169  0.7658424  1.068556
+    ##   0.010      3                  1200     1.327850  0.7660202  1.067032
+    ##   0.010      3                  1300     1.323073  0.7668483  1.063888
+    ##   0.010      3                  1400     1.319027  0.7676234  1.062418
+    ##   0.010      3                  1500     1.320768  0.7665930  1.063287
+    ##   0.010      3                  1600     1.323541  0.7653681  1.064973
+    ##   0.010      3                  1700     1.323796  0.7651722  1.065029
+    ##   0.010      3                  1800     1.322689  0.7656988  1.063674
+    ##   0.010      3                  1900     1.322997  0.7655423  1.063907
+    ##   0.010      3                  2000     1.322834  0.7652224  1.064482
+    ## 
+    ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
+    ## RMSE was used to select the optimal model using the smallest value.
+    ## The final values used for the model were n.trees = 1400,
+    ##  interaction.depth = 3, shrinkage = 0.01 and n.minobsinnode = 10.
+
+``` r
+plot(gbm_carseats)
+```
+
+![](homework-4_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+``` r
+pred_carseats_4 = predict(gbm_carseats, testing)
+mean((testing$Sales - pred_carseats_4)^2)
+```
+
+    ## [1] 1.781054
+
+The MSE is 1.834. Improves yet again.
+
+1.  Fit a multiple regression model to the training data and report the estimated test MSE
+
+``` r
+lm_carseats <- lm(Sales ~.,
+                  data = training)
+
+
+#Backwards setpwise regression
+library(MASS)
+step_carseats <- stepAIC(lm_carseats, direction='backward')
+```
+
+    ## Start:  AIC=30.69
+    ## Sales ~ CompPrice + Income + Advertising + Population + Price + 
+    ##     ShelveLoc + Age + Education + Urban + US
+    ## 
+    ##               Df Sum of Sq    RSS     AIC
+    ## - Population   1      0.21 208.01  28.895
+    ## - Education    1      0.51 208.31  29.185
+    ## - US           1      1.06 208.87  29.719
+    ## - Urban        1      1.29 209.10  29.939
+    ## <none>                     207.81  30.695
+    ## - Income       1     32.99 240.79  58.309
+    ## - Advertising  1     54.28 262.09  75.338
+    ## - Age          1     96.87 304.68 105.608
+    ## - CompPrice    1    271.38 479.19 196.625
+    ## - ShelveLoc    2    496.48 704.29 272.030
+    ## - Price        1    612.29 820.10 304.630
+    ## 
+    ## Step:  AIC=28.89
+    ## Sales ~ CompPrice + Income + Advertising + Price + ShelveLoc + 
+    ##     Age + Education + Urban + US
+    ## 
+    ##               Df Sum of Sq    RSS     AIC
+    ## - Education    1      0.56 208.57  27.433
+    ## - Urban        1      1.23 209.25  28.083
+    ## - US           1      1.38 209.40  28.227
+    ## <none>                     208.01  28.895
+    ## - Income       1     33.00 241.01  56.492
+    ## - Advertising  1     65.76 273.78  82.110
+    ## - Age          1     96.94 304.95 103.785
+    ## - CompPrice    1    271.24 479.26 194.655
+    ## - ShelveLoc    2    497.35 705.36 270.337
+    ## - Price        1    612.51 820.53 302.735
+    ## 
+    ## Step:  AIC=27.43
+    ## Sales ~ CompPrice + Income + Advertising + Price + ShelveLoc + 
+    ##     Age + Urban + US
+    ## 
+    ##               Df Sum of Sq    RSS     AIC
+    ## - US           1      1.26 209.83  26.640
+    ## - Urban        1      1.34 209.91  26.723
+    ## <none>                     208.57  27.433
+    ## - Income       1     32.59 241.16  54.615
+    ## - Advertising  1     65.22 273.80  80.125
+    ## - Age          1     96.45 305.02 101.834
+    ## - CompPrice    1    271.34 479.92 192.932
+    ## - ShelveLoc    2    497.69 706.26 268.592
+    ## - Price        1    612.36 820.93 300.835
+    ## 
+    ## Step:  AIC=26.64
+    ## Sales ~ CompPrice + Income + Advertising + Price + ShelveLoc + 
+    ##     Age + Urban
+    ## 
+    ##               Df Sum of Sq    RSS     AIC
+    ## - Urban        1      1.25 211.08  25.831
+    ## <none>                     209.83  26.640
+    ## - Income       1     32.40 242.22  53.498
+    ## - Advertising  1     93.16 302.99  98.490
+    ## - Age          1     98.08 307.91 101.728
+    ## - CompPrice    1    270.09 479.92 190.932
+    ## - ShelveLoc    2    496.69 706.52 266.666
+    ## - Price        1    611.45 821.28 298.919
+    ## 
+    ## Step:  AIC=25.83
+    ## Sales ~ CompPrice + Income + Advertising + Price + ShelveLoc + 
+    ##     Age
+    ## 
+    ##               Df Sum of Sq    RSS     AIC
+    ## <none>                     211.08  25.831
+    ## - Income       1     32.90 243.97  52.944
+    ## - Advertising  1     93.57 304.65  97.587
+    ## - Age          1     96.90 307.98  99.773
+    ## - CompPrice    1    269.12 480.19 189.047
+    ## - ShelveLoc    2    495.49 706.57 264.679
+    ## - Price        1    618.85 829.92 299.023
+
+``` r
+step_carseats$anova
+```
+
+    ## Stepwise Model Path 
+    ## Analysis of Deviance Table
+    ## 
+    ## Initial Model:
+    ## Sales ~ CompPrice + Income + Advertising + Population + Price + 
+    ##     ShelveLoc + Age + Education + Urban + US
+    ## 
+    ## Final Model:
+    ## Sales ~ CompPrice + Income + Advertising + Price + ShelveLoc + 
+    ##     Age
+    ## 
+    ## 
+    ##           Step Df  Deviance Resid. Df Resid. Dev      AIC
+    ## 1                                 189   207.8076 30.69490
+    ## 2 - Population  1 0.2066936       190   208.0143 28.89472
+    ## 3  - Education  1 0.5577104       191   208.5721 27.43291
+    ## 4         - US  1 1.2560734       192   209.8281 26.63975
+    ## 5      - Urban  1 1.2472010       193   211.0753 25.83094
+
+``` r
+pred_carseats_5 = predict(step_carseats, testing)
+mean((testing$Sales - pred_carseats_5)^2)
+```
+
+    ## [1] 1.018354
+
+The MSE is 1.01. The lowest of the set.
+
+1.  Summarize your results
+
+The backwards stepwise linear regression model is the best model of the methods with a testing mean square error of 1.01.
+
+Model Mean Square Error Summary b- Regression Tree MSE: 4.48 c- CV Pruned Regression Tree MSE: 6.17 d- Bagged Random Forest MSE: 3.06 e- Random Forest: 2.87 f- Gradient Boosted Model: 1.834 G- Backwards stepwise linear regression: 1.01.
