@@ -1,7 +1,7 @@
 Homework 4: Bags, Forests, Boosts, oh my
 ================
 Eric Stromgren
-2/28/2019
+3/8/2019
 
 Problem 1
 ---------
@@ -11,61 +11,43 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of `
 Answer 1
 --------
 
-<https://uc-r.github.io/random_forests>
-
 ``` r
-set.seed(1)
-df<- tbl_df(Boston)
-inTraining <- createDataPartition(df$medv, p=.75, list= F)
-training <- df[inTraining, ]
-testing <- df[-inTraining, ]
+set.seed(1234)
+df_bos <- tbl_df(Boston)
+inTraining_bos <- createDataPartition(df_bos$medv, p = .75, list = F)
+training_bos <- df_bos[inTraining_bos,]
+testing_bos <- df_bos[-inTraining_bos, ]
 
-for (t in training) {
-  i = 0
-  rf_boston_cv <- train(medv ~.,
-                        data = training,
-                        method = "rf",
-                        ntree = 25 + (i  * 25),
-                        importance = T,
-                        tuneGrid = data.frame(mtry=3:9))
-  summary(rf_boston_cv)
-  i <- i + 1
-  if (i == 19) {
-    break}
+
+#Change values
+set.seed(4321)
+mtry <- c(3:9)
+ntree <- seq(25, 500, len = 20)
+results <- tibble(mtry = rep(NA, 140),
+                  ntree = rep(NA, 140),
+                  mse = rep(NA, 140))
+
+for(i in 1:7){
+  for(j in 1:20){
+    rf_train_bos<-randomForest(medv ~.,
+                          data = training_bos,
+                          mtry = mtry[i],
+                          ntree = ntree[j])
+    mse <- mean((predict(rf_train_bos, newdata=testing_bos) - testing_bos$medv)^2)
+    results[(i-1)*20 + j, ] <- c(mtry[i], ntree[j], mse)
+  }
 }
+
+p <- ggplot(data = results,
+            aes(x = ntree, y= mse, col = as.factor(mtry)))
+p + geom_line() +
+  geom_point() +
+  scale_color_brewer("mtry", palette = "Dark2")
 ```
 
-Construct the train and test matrices
-=====================================
+![](homework-4_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
-set.seed(1234) df &lt;- tbl\_df(Boston) inTraining &lt;- createDataPartition(df$medv, p = .75, list = F) training &lt;- df\[inTraining, \] testing &lt;- df\[-inTraining, \]
-
-tuneRF(x, y, mtryStart, ntreeTry=50, stepFactor=2, improve=0.05, trace=TRUE, plot=TRUE, doBest=FALSE, ...)
-
-set.seed(1234) grid &lt;- expand.grid(n.trees = seq(25, 500, by = 25), n.minobsinnode = 5)
-
-set.seed(1234) rf\_boston\_cv &lt;- train(medv ~ ., data = training, method = "rf", ntree = 100, importance = T, tuneGrid = data.frame(mtry = 3:9)) rf\_boston\_cv
-
-bag\_boston\_25\_3 &lt;- randomForest(training, testing, mtry = 3, ntree = 25) \`\`\`
-
-``` r
-bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
-bag_boston
-```
-
-    ## 
-    ## Call:
-    ##  randomForest(formula = medv ~ ., data = training, mtry = 13) 
-    ##                Type of random forest: regression
-    ##                      Number of trees: 500
-    ## No. of variables tried at each split: 13
-    ## 
-    ##           Mean of squared residuals: 10.70519
-    ##                     % Var explained: 87.86
-
-bag\_boston\_50\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 50) bag\_boston\_75\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 75) bag\_boston\_100\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 100) \# bag\_boston\_125\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 125) \# bag\_boston\_150\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 150) \# bag\_boston\_175\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 175) \# bag\_boston\_200\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 200) \# bag\_boston\_225\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 225) \# bag\_boston\_250\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 250) \# bag\_boston\_275\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 275) \# bag\_boston\_300\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 300) \# bag\_boston\_325\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 325) \# bag\_boston\_350\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 350) \# bag\_boston\_375\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 375) \# bag\_boston\_400\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 400) \# bag\_boston\_425\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 425) \# bag\_boston\_450\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 450) \# bag\_boston\_475\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 475) \# bag\_boston\_500\_3 &lt;- randomForest(x\_training, y\_training, xtest = x\_testing, ytest = y\_testing, mtry = 3, ntree = 500) \# \# \# plot(1:500, rf.boston.p*t**e**s**t*mse, col = "green", type = "l", xlab = "Number of Trees", \# ylab = "Test MSE", ylim = c(10, 19)) \# lines(1:500, rf.boston.p.2*t**e**s**t*mse, col = "red", type = "l") \# lines(1:500, rf.boston.p.sq*t**e**s**t*mse, col = "blue", type = "l") \# legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"), \# cex = 1, lty = 1) \# \# \# \# \# \# bag\_boston
-
-\`\`\`
+Appreciated the walkthrough in class on this problem. Helped me understand it better.
 
 Problem 2
 ---------
@@ -76,9 +58,7 @@ Problem 8 from Chapter 8 in the text. Set your seed with 9823 and split into tra
 2.  Fit a multiple regression model to the training data and report the estimated test MSE
 3.  Summarize your results.
 
-<!-- -->
-
-1.  
+Answer A
 
 ``` r
 library(tree)
@@ -91,7 +71,7 @@ training <- df[inTraining, ]
 testing <- df[-inTraining, ]
 ```
 
-1.  
+Answer B
 
 ``` r
 tree_carseats <- rpart::rpart(Sales ~ ., 
@@ -349,13 +329,13 @@ summary(tree_carseats)
 prp(tree_carseats)
 ```
 
-![](homework-4_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](homework-4_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
 ``` r
 plot(as.party(tree_carseats))
 ```
 
-![](homework-4_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](homework-4_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 ``` r
 pred_carseats = predict(tree_carseats, testing)
@@ -366,7 +346,7 @@ mean((testing$Sales - pred_carseats)^2)
 
 The Test MSE is 4.48
 
-1.  
+Answer C
 
 ``` r
 fit_control <- trainControl(method = "repeatedcv",
@@ -385,13 +365,13 @@ cv_tree_carseats <- train(Sales ~ .,
 plot(cv_tree_carseats)
 ```
 
-![](homework-4_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](homework-4_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 ``` r
 plot(as.party(cv_tree_carseats$finalModel))
 ```
 
-![](homework-4_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](homework-4_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ``` r
 pred_carseats_1 = predict(cv_tree_carseats, testing)
@@ -402,7 +382,7 @@ mean((testing$Sales - pred_carseats_1)^2)
 
 Pruning increases the test MSE to 6.17
 
-1.  
+Answer D
 
 ``` r
 bag_carseats <- randomForest(Sales ~ ., data = training, mtry = 10)
@@ -449,7 +429,7 @@ importance(bag_carseats)
 
 ShelveLoc, Price and CompPrice are the most important predictors of Sales.
 
-1.  
+Answer E
 
 ``` r
 rf_carseats <- randomForest(Sales ~ ., 
@@ -495,9 +475,7 @@ importance(rf_carseats)
 
 The most important variables in the random forest model are ShelveLoc, Price, and Comp Price again liked the baggged appraoch.
 
-Additional questions 3. Summarize your results.
-
-1.  
+Additional questions Question 1. Gradient boosted model
 
 ``` r
 grid <- expand.grid(interaction.depth = c(1, 3), 
@@ -626,7 +604,7 @@ gbm_carseats
 plot(gbm_carseats)
 ```
 
-![](homework-4_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](homework-4_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 ``` r
 pred_carseats_4 = predict(gbm_carseats, testing)
@@ -637,7 +615,9 @@ mean((testing$Sales - pred_carseats_4)^2)
 
 The MSE is 1.834. Improves yet again.
 
-1.  Fit a multiple regression model to the training data and report the estimated test MSE
+Question 2. Fit a multiple regression model to the training data and report the estimated test MSE
+
+Decided to do a backwards stepwise regression for practice. I noticed that the MSE was very close to others who ran lm().
 
 ``` r
 lm_carseats <- lm(Sales ~.,
@@ -754,10 +734,10 @@ mean((testing$Sales - pred_carseats_5)^2)
 
     ## [1] 1.018354
 
-The MSE is 1.01. The lowest of the set.
+The MSE is 1.01. The lowest of the homework No. 2 problem set.
 
-1.  Summarize your results
+Question 3. Summarize your results
 
 The backwards stepwise linear regression model is the best model of the methods with a testing mean square error of 1.01.
 
-Model Mean Square Error Summary b- Regression Tree MSE: 4.48 c- CV Pruned Regression Tree MSE: 6.17 d- Bagged Random Forest MSE: 3.06 e- Random Forest: 2.87 f- Gradient Boosted Model: 1.834 G- Backwards stepwise linear regression: 1.01.
+Model Mean Square Error Summary: b- Regression Tree MSE: 4.48 c- CV Pruned Regression Tree MSE: 6.17 d- Bagged Random Forest MSE: 3.06 e- Random Forest: 2.87 f- Gradient Boosted Model: 1.834 g- Backwards stepwise linear regression: 1.01.

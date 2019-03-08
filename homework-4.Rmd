@@ -1,7 +1,7 @@
 ---
 title: 'Homework 4: Bags, Forests, Boosts, oh my'
 author: "Eric Stromgren"
-date: "2/28/2019"
+date: "3/8/2019"
 output: github_document
 ---
 
@@ -32,109 +32,41 @@ Problem 7 from Chapter 8 in the text. To be specific, please use a sequence of
 `ntree` from 25 to 500 in steps of 25 and `mtry` from 3 to 9 for by 1. 
 
 ## Answer 1
-https://uc-r.github.io/random_forests
-
 ```{r}
-set.seed(1)
-df<- tbl_df(Boston)
-inTraining <- createDataPartition(df$medv, p=.75, list= F)
-training <- df[inTraining, ]
-testing <- df[-inTraining, ]
+set.seed(1234)
+df_bos <- tbl_df(Boston)
+inTraining_bos <- createDataPartition(df_bos$medv, p = .75, list = F)
+training_bos <- df_bos[inTraining_bos,]
+testing_bos <- df_bos[-inTraining_bos, ]
 
-for (t in training) {
-  i = 0
-  rf_boston_cv <- train(medv ~.,
-                        data = training,
-                        method = "rf",
-                        ntree = 25 + (i  * 25),
-                        importance = T,
-                        tuneGrid = data.frame(mtry=3:9))
-  summary(rf_boston_cv)
-  i <- i + 1
-  if (i == 19) {
-    break}
+
+#Change values
+set.seed(4321)
+mtry <- c(3:9)
+ntree <- seq(25, 500, len = 20)
+results <- tibble(mtry = rep(NA, 140),
+                  ntree = rep(NA, 140),
+                  mse = rep(NA, 140))
+
+for(i in 1:7){
+  for(j in 1:20){
+    rf_train_bos<-randomForest(medv ~.,
+                          data = training_bos,
+                          mtry = mtry[i],
+                          ntree = ntree[j])
+    mse <- mean((predict(rf_train_bos, newdata=testing_bos) - testing_bos$medv)^2)
+    results[(i-1)*20 + j, ] <- c(mtry[i], ntree[j], mse)
+  }
 }
+
+p <- ggplot(data = results,
+            aes(x = ntree, y= mse, col = as.factor(mtry)))
+p + geom_line() +
+  geom_point() +
+  scale_color_brewer("mtry", palette = "Dark2")
 ```
 
-
-
-# Construct the train and test matrices
-set.seed(1234)
-df <- tbl_df(Boston)
-inTraining <- createDataPartition(df$medv, p = .75, list = F)
-training <- df[inTraining, ]
-testing  <- df[-inTraining, ]
-
-tuneRF(x, y, mtryStart, ntreeTry=50, stepFactor=2, improve=0.05,
-       trace=TRUE, plot=TRUE, doBest=FALSE, ...)
-
-
-set.seed(1234)
-grid <- expand.grid(n.trees = seq(25, 500, by = 25),
-                    n.minobsinnode = 5)
-
-set.seed(1234)
-rf_boston_cv <- train(medv ~ ., 
-                      data = training,
-                      method = "rf",
-                      ntree = 100,
-                      importance = T,
-                      tuneGrid = data.frame(mtry = 3:9))
-rf_boston_cv
-
-
-
-
-
-bag_boston_25_3 <- randomForest(training, testing, mtry = 3, ntree = 25)
-```
-
-```{r}
-bag_boston <- randomForest(medv ~ ., data = training, mtry = 13)
-bag_boston
-```
-
-
-
-
-
-bag_boston_50_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 50)
-bag_boston_75_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 75)
-bag_boston_100_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 100)
-# bag_boston_125_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 125)
-# bag_boston_150_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 150)
-# bag_boston_175_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 175)
-# bag_boston_200_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 200)
-# bag_boston_225_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 225)
-# bag_boston_250_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 250)
-# bag_boston_275_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 275)
-# bag_boston_300_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 300)
-# bag_boston_325_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 325)
-# bag_boston_350_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 350)
-# bag_boston_375_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 375)
-# bag_boston_400_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 400)
-# bag_boston_425_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 425)
-# bag_boston_450_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 450)
-# bag_boston_475_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 475)
-# bag_boston_500_3 <- randomForest(x_training, y_training, xtest = x_testing, ytest = y_testing, mtry = 3, ntree = 500)
-#
-#
-# plot(1:500, rf.boston.p$test$mse, col = "green", type = "l", xlab = "Number of Trees",
-#     ylab = "Test MSE", ylim = c(10, 19))
-# lines(1:500, rf.boston.p.2$test$mse, col = "red", type = "l")
-# lines(1:500, rf.boston.p.sq$test$mse, col = "blue", type = "l")
-# legend("topright", c("m=p", "m=p/2", "m=sqrt(p)"), col = c("green", "red", "blue"),
-#     cex = 1, lty = 1)
-#
-#
-#
-#
-#
-# bag_boston
-
-
-```
-
+Appreciated the walkthrough in class on this problem. Helped me understand it better.
 
 ## Problem 2
 
@@ -149,7 +81,7 @@ estimated test MSE
 3. Summarize your results. 
 
 
-a.
+Answer A 
 ```{r}
 library(tree)
 library(ISLR)
@@ -161,8 +93,7 @@ training <- df[inTraining, ]
 testing <- df[-inTraining, ]
 ```
 
-b.
-
+Answer B
 ```{r}
 tree_carseats <- rpart::rpart(Sales ~ ., 
                       data = training,
@@ -182,7 +113,7 @@ mean((testing$Sales - pred_carseats)^2)
 
 The Test MSE is 4.48
 
-c.
+Answer C
 
 ```{r}
 
@@ -206,7 +137,7 @@ mean((testing$Sales - pred_carseats_1)^2)
 Pruning increases the test MSE to 6.17
 
 
-d.
+Answer D
 
 ```{r}
 bag_carseats <- randomForest(Sales ~ ., data = training, mtry = 10)
@@ -227,7 +158,7 @@ importance(bag_carseats)
 ```
 ShelveLoc, Price and CompPrice are the most important predictors of Sales.
 
-e.
+Answer E
 
 ```{r}
 rf_carseats <- randomForest(Sales ~ ., 
@@ -249,10 +180,7 @@ importance(rf_carseats)
 The most important variables in the random forest model are ShelveLoc, Price, and Comp Price again liked the baggged appraoch.
 
 Additional questions
-3. Summarize your results. 
-
-
-1.
+Question 1. Gradient boosted model
 
 
 ```{r}
@@ -282,7 +210,9 @@ mean((testing$Sales - pred_carseats_4)^2)
 
 The MSE is 1.834. Improves yet again.
 
-2. Fit a multiple regression model to the training data and report the  estimated test MSE
+Question 2. Fit a multiple regression model to the training data and report the estimated test MSE
+
+Decided to do a backwards stepwise regression for practice. I noticed that the MSE was very close to others who ran lm().
 
 ```{r}
 lm_carseats <- lm(Sales ~.,
@@ -299,19 +229,19 @@ pred_carseats_5 = predict(step_carseats, testing)
 mean((testing$Sales - pred_carseats_5)^2)
 
 ```
-The MSE is 1.01. The lowest of the set.
+The MSE is 1.01. The lowest of the homework No. 2 problem set.
 
-3. Summarize your results
+Question 3. Summarize your results
 
 The backwards stepwise linear regression model is the best model of the methods with a testing mean square error of 1.01.
 
-Model Mean Square Error Summary
+Model Mean Square Error Summary:
 b- Regression Tree MSE: 4.48
 c- CV Pruned Regression Tree MSE: 6.17
 d- Bagged Random Forest MSE: 3.06
 e- Random Forest: 2.87
 f- Gradient Boosted Model: 1.834
-G- Backwards stepwise linear regression: 1.01.
+g- Backwards stepwise linear regression: 1.01.
 
 
 
